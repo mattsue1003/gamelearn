@@ -687,7 +687,11 @@
 </head>
 <body>
   <header class="hero">
-    <img src="assets/interactive-teaching-hero.png" alt="互動式教學工作坊中的講師與學員正在使用圖卡討論">
+    <img
+      src="assets/interactive-teaching-hero.png"
+      data-file-src="file:///Users/matt/Documents/%E9%81%8A%E6%88%B2%E5%8C%96%E6%95%99%E5%AD%B8/assets/interactive-teaching-hero.png"
+      alt="互動式教學工作坊中的講師與學員正在使用圖卡討論"
+    >
     <div class="hero-inner">
       <p class="eyebrow">Teaching Methods Knowledge Cards</p>
       <h1>互動式與遊戲化教學法知識圖卡</h1>
@@ -840,6 +844,16 @@
   </div>
 
   <script>
+    document.querySelectorAll("img[data-file-src]").forEach(image => {
+      const useFileFallback = () => {
+        if (image.dataset.fallbackTried === "true") return;
+        image.dataset.fallbackTried = "true";
+        image.src = image.dataset.fileSrc;
+      };
+      image.addEventListener("error", useFileFallback);
+      if (image.complete && image.naturalWidth === 0) useFileFallback();
+    });
+
     const categories = [
       ["全部", "全部"],
       ["提問討論", "discuss"],
