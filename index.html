@@ -1,0 +1,1869 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>互動式與遊戲化教學法知識圖卡</title>
+  <style>
+    :root {
+      --ink: #17212b;
+      --muted: #607080;
+      --line: #d9e1e8;
+      --paper: #fbfcf8;
+      --panel: #ffffff;
+      --blue: #1e6b8f;
+      --green: #2d775d;
+      --red: #b9574c;
+      --gold: #b88422;
+      --violet: #6f5aa8;
+      --shadow: 0 18px 50px rgba(23, 33, 43, .12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.65;
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    .hero {
+      min-height: 62vh;
+      display: flex;
+      align-items: flex-end;
+      position: relative;
+      overflow: hidden;
+      background: #22313a;
+    }
+
+    .hero img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(7, 17, 24, .78), rgba(7, 17, 24, .42) 44%, rgba(7, 17, 24, .08));
+    }
+
+    .hero-inner {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 72px 0 44px;
+      position: relative;
+      z-index: 1;
+      color: #fff;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      font-size: .9rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      opacity: .86;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(2.4rem, 6vw, 5.7rem);
+      line-height: 1.02;
+      letter-spacing: 0;
+    }
+
+    .hero-copy {
+      max-width: 720px;
+      margin: 20px 0 28px;
+      font-size: clamp(1.05rem, 2.2vw, 1.32rem);
+      color: rgba(255, 255, 255, .9);
+    }
+
+    .searchbar {
+      width: min(760px, 100%);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      padding: 8px;
+      background: rgba(255, 255, 255, .94);
+      border: 1px solid rgba(255, 255, 255, .58);
+      box-shadow: var(--shadow);
+    }
+
+    .searchbar input {
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      padding: 14px 16px;
+      color: var(--ink);
+      background: transparent;
+    }
+
+    .searchbar button,
+    .icon-button {
+      border: 0;
+      cursor: pointer;
+      background: var(--ink);
+      color: white;
+      padding: 0 18px;
+      min-width: 48px;
+      transition: transform .18s ease, background .18s ease;
+    }
+
+    .searchbar button:hover,
+    .icon-button:hover {
+      transform: translateY(-1px);
+      background: #263849;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+      padding: 30px 0 20px;
+    }
+
+    .summary h2 {
+      margin: 0 0 4px;
+      font-size: 1.35rem;
+    }
+
+    .summary p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .select-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    select {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      padding: 0 36px 0 12px;
+      border-radius: 6px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-bottom: 24px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 8px 13px;
+      cursor: pointer;
+    }
+
+    .chip[aria-pressed="true"] {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 16px;
+      padding-bottom: 54px;
+    }
+
+    .prompt-lab {
+      display: grid;
+      grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+      gap: 18px;
+      margin: 0 0 28px;
+      padding: 22px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: #eef6f8;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .prompt-lab h2 {
+      margin: 0 0 6px;
+      font-size: 1.42rem;
+    }
+
+    .prompt-lab p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .builder {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      font-weight: 700;
+    }
+
+    .field-hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px 13px;
+      background: #fff;
+      color: var(--ink);
+      outline: 0;
+      resize: vertical;
+    }
+
+    .field textarea {
+      min-height: 170px;
+    }
+
+    .prompt-preview-panel {
+      align-self: start;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .7);
+      padding: 12px;
+    }
+
+    .prompt-preview-panel summary {
+      cursor: pointer;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .prompt-preview-panel .field {
+      margin-top: 12px;
+    }
+
+    .selected-methods {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 34px;
+    }
+
+    .selected-methods button {
+      border: 1px solid #b7c9d5;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .ai-actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .action-group {
+      display: grid;
+      gap: 8px;
+    }
+
+    .action-title {
+      margin: 0;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .action-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .ai-button,
+    .secondary-button,
+    .select-card {
+      min-height: 42px;
+      border: 1px solid var(--ink);
+      border-radius: 6px;
+      background: var(--ink);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .ai-button.gemini {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+
+    .ai-button.claude {
+      background: #7a5538;
+      border-color: #7a5538;
+    }
+
+    .ai-button span {
+      display: block;
+      font-size: .78rem;
+      font-weight: 600;
+      opacity: .88;
+    }
+
+    .secondary-button {
+      background: #fff;
+      color: var(--ink);
+      border-color: #b7c9d5;
+    }
+
+    .prompt-status {
+      min-height: 24px;
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .quick-links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid #b7c9d5;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .floating-tray {
+      position: fixed;
+      left: 50%;
+      bottom: 14px;
+      z-index: 15;
+      width: min(560px, calc(100% - 28px));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, .52);
+      border-radius: 8px;
+      background: rgba(23, 33, 43, .94);
+      color: #fff;
+      box-shadow: var(--shadow);
+      transform: translateX(-50%);
+    }
+
+    .floating-tray[hidden] {
+      display: none;
+    }
+
+    .floating-tray a {
+      flex: 0 0 auto;
+      min-height: 36px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .card {
+      min-height: 330px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      background: var(--panel);
+      box-shadow: 0 8px 24px rgba(23, 33, 43, .06);
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+
+    .card:hover,
+    .card:focus-visible {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 36px rgba(23, 33, 43, .12);
+      border-color: #a8bac8;
+      outline: 0;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      color: #fff;
+      font-size: .82rem;
+      white-space: nowrap;
+      background: var(--blue);
+    }
+
+    .tag.discuss { background: var(--blue); }
+    .tag.case { background: var(--red); }
+    .tag.game { background: var(--gold); color: #1d1b16; }
+    .tag.media { background: var(--violet); }
+    .tag.practice { background: var(--green); }
+    .tag.coop { background: #40757d; }
+    .tag.reflect { background: #8d5e40; }
+    .tag.creative { background: #9a516d; }
+    .tag.tech { background: #475c99; }
+    .tag.assess { background: #59666f; }
+    .tag.learning { background: #256f6b; }
+    .tag.inclusive { background: #6a6f2f; }
+
+    .card h3 {
+      margin: 0;
+      font-size: 1.36rem;
+      line-height: 1.2;
+    }
+
+    .select-card {
+      min-height: 36px;
+      padding: 0 11px;
+      font-size: .86rem;
+      white-space: nowrap;
+    }
+
+    .select-card.selected {
+      background: #fff;
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .pill {
+      border: 1px solid #dce5eb;
+      background: #f6fafb;
+      color: #455765;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: .78rem;
+    }
+
+    .empty {
+      display: none;
+      padding: 42px 0 72px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(10, 18, 25, .62);
+      z-index: 20;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .dialog {
+      width: min(880px, 100%);
+      max-height: min(86vh, 820px);
+      overflow: auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 22px 72px rgba(0, 0, 0, .28);
+    }
+
+    .dialog-head {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: start;
+      padding: 22px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .dialog h2 {
+      margin: 7px 0 0;
+      font-size: 2rem;
+      line-height: 1.18;
+    }
+
+    .close {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: #fff;
+      cursor: pointer;
+      font-size: 1.45rem;
+      line-height: 1;
+    }
+
+    .dialog-body {
+      padding: 22px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .detail {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 15px;
+      background: #fbfdff;
+    }
+
+    .detail.full {
+      grid-column: 1 / -1;
+    }
+
+    .detail h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .detail p,
+    .detail ol {
+      margin: 0;
+      color: #40505d;
+    }
+
+    .detail ol {
+      padding-left: 1.25rem;
+    }
+
+    .detail li + li {
+      margin-top: 4px;
+    }
+
+    .lesson-flow {
+      margin: 0 0 54px;
+      padding: 26px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: #f2f7f4;
+    }
+
+    .lesson-flow h2 {
+      margin: 0 0 12px;
+      font-size: 1.35rem;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .flow span {
+      display: flex;
+      align-items: center;
+      min-height: 66px;
+      padding: 10px;
+      border: 1px solid #cbdcd2;
+      border-radius: 8px;
+      background: #fff;
+      font-weight: 700;
+      color: #244435;
+    }
+
+    @media (max-width: 760px) {
+      .hero {
+        min-height: 60vh;
+      }
+
+      .hero-inner {
+        width: min(100% - 28px, 1180px);
+        padding-bottom: 32px;
+      }
+
+      .searchbar {
+        grid-template-columns: 1fr 48px;
+      }
+
+      .searchbar button {
+        padding: 0;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .select-row {
+        justify-content: flex-start;
+      }
+
+      select {
+        width: 100%;
+      }
+
+      .detail-grid,
+      .flow,
+      .prompt-lab,
+      .ai-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .prompt-preview-panel textarea {
+        min-height: 130px;
+      }
+
+      .dialog h2 {
+        font-size: 1.55rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <img src="assets/interactive-teaching-hero.png" alt="互動式教學工作坊中的講師與學員正在使用圖卡討論">
+    <div class="hero-inner">
+      <p class="eyebrow">Teaching Methods Knowledge Cards</p>
+      <h1>互動式與遊戲化教學法知識圖卡</h1>
+      <p class="hero-copy">把問答、案例、電影、桌遊、實作、反思與科技互動整理成可搜尋、可篩選、可示範的備課工具。</p>
+      <form class="searchbar" id="searchForm">
+        <input id="searchInput" type="search" placeholder="搜尋教學法、應用場景或示範關鍵字" aria-label="搜尋教學法">
+        <button type="submit" title="搜尋" aria-label="搜尋">⌕</button>
+      </form>
+    </div>
+  </header>
+
+  <main>
+    <section class="toolbar" aria-label="篩選工具">
+      <div class="summary">
+        <h2 id="resultTitle">全部教學法</h2>
+        <p id="resultMeta">正在顯示所有知識圖卡。</p>
+      </div>
+      <div class="select-row">
+        <select id="goalFilter" aria-label="依學習目標篩選">
+          <option value="全部">全部學習目標</option>
+          <option value="參與動機">參與動機</option>
+          <option value="理解深化">理解深化</option>
+          <option value="技能練習">技能練習</option>
+          <option value="態度改變">態度改變</option>
+          <option value="問題解決">問題解決</option>
+          <option value="成效評量">成效評量</option>
+        </select>
+        <select id="audienceFilter" aria-label="依適用場域篩選">
+          <option value="全部">全部場域</option>
+          <option value="企業">企業講師</option>
+          <option value="社區">社區講師</option>
+          <option value="學校">學校教師</option>
+        </select>
+      </div>
+    </section>
+
+    <nav class="chips" id="categoryChips" aria-label="教學法分類"></nav>
+
+    <section class="prompt-lab" id="promptBuilder" aria-label="AI 教案提示詞產生器">
+      <div class="builder">
+        <div>
+          <h2>AI 教案設計器</h2>
+          <p>輸入課程條件，再從下方選 3 到 5 張適合的圖卡。AI 會先檢查方法是否適配，再產出可執行教案。</p>
+        </div>
+        <div class="field">
+          <label for="topicInput">課程主題</label>
+          <input id="topicInput" type="text" placeholder="例如：高齡者防詐、企業跨部門溝通、國中生媒體識讀">
+          <p class="field-hint">寫「要教什麼」，越具體越容易產生好教案。</p>
+        </div>
+        <div class="field">
+          <label for="audienceInput">對象與限制</label>
+          <input id="audienceInput" type="text" placeholder="例如：30 位社區長者，90 分鐘，有投影機、便利貼，多數人會用手機">
+          <p class="field-hint">寫「誰來上、多久、場地設備、程度差異、不能做什麼」。</p>
+        </div>
+        <div class="field">
+          <label for="outcomeInput">學習目標與期待成果</label>
+          <input id="outcomeInput" type="text" placeholder="例如：能辨識 3 種詐騙話術，完成一張家庭防詐提醒卡">
+          <p class="field-hint">寫「上完後要能做什麼」，AI 會用它來校準活動與評量。</p>
+        </div>
+        <div>
+          <p><strong>已選教學圖卡</strong></p>
+          <div class="selected-methods" id="selectedMethods">
+            <span class="pill">尚未選擇</span>
+          </div>
+        </div>
+        <div class="action-group">
+          <p class="action-title">方法 1：複製 Prompt 到 App 貼上</p>
+          <button class="secondary-button" id="copyPrompt" type="button">複製 Prompt</button>
+        </div>
+        <div class="action-group">
+          <p class="action-title">方法 2：帶入 Prompt 開啟 AI</p>
+          <p class="action-note">會嘗試把提示詞放進新對話；若服務或手機 App 不支援，仍可用已複製的 Prompt 貼上。</p>
+          <div class="ai-actions" aria-label="帶入 Prompt 開啟 AI 工具">
+            <button class="ai-button chatgpt" type="button" data-ai="chatgpt">ChatGPT<span>帶入 Prompt</span></button>
+            <button class="ai-button gemini" type="button" data-ai="gemini">Gemini<span>帶入 Prompt</span></button>
+            <button class="ai-button claude" type="button" data-ai="claude">Claude<span>帶入 Prompt</span></button>
+          </div>
+        </div>
+        <div class="quick-links" aria-label="快速導覽">
+          <a href="#cardGrid">前往圖卡</a>
+          <a href="#categoryChips">查看分類</a>
+        </div>
+        <p class="prompt-status" id="promptStatus" aria-live="polite"></p>
+      </div>
+      <details class="prompt-preview-panel">
+        <summary>查看 Prompt 預覽</summary>
+        <div class="field">
+          <label for="promptPreview">Prompt 預覽</label>
+          <textarea id="promptPreview" readonly></textarea>
+        </div>
+      </details>
+    </section>
+
+    <section class="grid" id="cardGrid" aria-live="polite"></section>
+    <p class="empty" id="emptyState">沒有找到符合條件的教學法。可以放寬分類或換一個關鍵字。</p>
+
+    <section class="lesson-flow">
+      <h2>一堂課的常用組合</h2>
+      <div class="flow" aria-label="課程流程範例">
+        <span>破冰暖身</span>
+        <span>問題引導</span>
+        <span>案例或影片</span>
+        <span>分組任務</span>
+        <span>發表回饋</span>
+        <span>行動承諾</span>
+      </div>
+    </section>
+  </main>
+
+  <div class="floating-tray" id="floatingTray" hidden>
+    <span id="floatingCount">已選 0 張圖卡</span>
+    <a href="#promptBuilder">回到設計器</a>
+  </div>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <article class="dialog">
+      <header class="dialog-head">
+        <div>
+          <span class="tag" id="modalTag"></span>
+          <h2 id="modalTitle"></h2>
+        </div>
+        <button class="close" id="closeModal" type="button" title="關閉" aria-label="關閉">×</button>
+      </header>
+      <div class="dialog-body">
+        <div class="meta" id="modalMeta"></div>
+        <div class="detail-grid">
+          <section class="detail">
+            <h3>定義</h3>
+            <p id="modalDefinition"></p>
+          </section>
+          <section class="detail">
+            <h3>適合應用</h3>
+            <p id="modalUse"></p>
+          </section>
+          <section class="detail">
+            <h3>操作步驟</h3>
+            <ol id="modalSteps"></ol>
+          </section>
+          <section class="detail">
+            <h3>講師提醒</h3>
+            <p id="modalTip"></p>
+          </section>
+          <section class="detail full">
+            <h3>示範活動</h3>
+            <p id="modalDemo"></p>
+          </section>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <script>
+    const categories = [
+      ["全部", "全部"],
+      ["提問討論", "discuss"],
+      ["案例情境", "case"],
+      ["遊戲化", "game"],
+      ["影片媒體", "media"],
+      ["體驗實作", "practice"],
+      ["合作學習", "coop"],
+      ["反思回饋", "reflect"],
+      ["創意表達", "creative"],
+      ["科技互動", "tech"],
+      ["評量檢核", "assess"],
+      ["學習科學", "learning"],
+      ["包容設計", "inclusive"]
+    ];
+
+    const methods = [
+      {
+        title: "問答法",
+        category: "提問討論",
+        className: "discuss",
+        goals: ["參與動機", "理解深化", "成效評量"],
+        audience: ["企業", "社區", "學校"],
+        definition: "講師透過問題引發回應，並從學員答案判斷理解程度，是最容易把單向講授轉成互動的基本方法。",
+        use: "適合開場喚起經驗、段落收束、觀念檢核、演講現場互動。",
+        steps: ["先問與生活或工作有關的問題", "等待三到五秒讓學員思考", "邀請兩到三位回答", "整理共同點並連回課程概念"],
+        demo: "在溝通課可問：你最近一次覺得對方沒有聽懂你，是發生在什麼情境？接著把答案分類成表達、傾聽、情緒三類。",
+        tip: "不要只問有標準答案的題目，混合經驗題與判斷題，現場會更有生命力。"
+      },
+      {
+        title: "蘇格拉底提問法",
+        category: "提問討論",
+        className: "discuss",
+        goals: ["理解深化", "態度改變"],
+        audience: ["企業", "社區", "學校"],
+        definition: "用連續追問協助學員檢查自己的假設、證據與推論，讓答案從學員的思考中長出來。",
+        use: "適合價值澄清、倫理議題、管理判斷、批判思考課程。",
+        steps: ["請學員提出一個看法", "追問理由與證據", "詢問反例或其他可能", "請學員修正或強化原本觀點"],
+        demo: "在領導課中，當學員說好主管要公平，可追問：公平是每個人都一樣，還是依貢獻與需求調整？",
+        tip: "語氣要像陪伴探索，不像審問。問題尖銳時，態度更要柔軟。"
+      },
+      {
+        title: "Think Pair Share",
+        category: "合作學習",
+        className: "coop",
+        goals: ["參與動機", "理解深化"],
+        audience: ["企業", "社區", "學校"],
+        definition: "先個人思考，再兩人交換，最後全班分享，能降低發言焦慮並提升答案品質。",
+        use: "適合任何人數，特別適合大班、安靜班級、課程剛開始時。",
+        steps: ["給一個清楚問題", "個人安靜寫下想法", "兩人互相說明", "邀請幾組分享精煉後的答案"],
+        demo: "在時間管理課中提問：你最常被哪一種事情打斷？先寫一分鐘，再兩人討論，最後收集全班前三名干擾源。",
+        tip: "題目不要太大，最好能在三分鐘內想出初步答案。"
+      },
+      {
+        title: "世界咖啡館",
+        category: "提問討論",
+        className: "discuss",
+        goals: ["參與動機", "問題解決"],
+        audience: ["企業", "社區", "學校"],
+        definition: "讓小組圍繞不同桌題輪流討論，透過移動與累積筆記匯聚集體智慧。",
+        use: "適合社區共識、組織變革、課程回饋、跨部門議題。",
+        steps: ["設定三到五個桌題", "每桌保留一位桌長", "其他人定時換桌", "最後由桌長整理洞察與行動建議"],
+        demo: "社區課可設三桌：長者需求、可用資源、可行活動。每十五分鐘換桌，最後產出一張社區行動地圖。",
+        tip: "桌題要開放但不空泛，例如把如何改善社區改成下個月能開始的一件小行動是什麼。"
+      },
+      {
+        title: "魚缸討論法",
+        category: "提問討論",
+        className: "discuss",
+        goals: ["理解深化", "態度改變"],
+        audience: ["企業", "學校"],
+        definition: "內圈進行討論，外圈觀察對話品質與觀點變化，之後交換回饋。",
+        use: "適合溝通訓練、衝突議題、會議技巧、班級討論規範。",
+        steps: ["安排內外圈座位", "給內圈討論任務", "外圈用觀察表記錄", "交換角色或進行觀察回饋"],
+        demo: "在會議課中，內圈討論是否導入彈性工時，外圈觀察誰在整合、誰在打斷、哪些提問讓討論前進。",
+        tip: "外圈要有具體觀察指標，否則容易變成旁觀。"
+      },
+      {
+        title: "六頂思考帽",
+        category: "創意表達",
+        className: "creative",
+        goals: ["問題解決", "理解深化"],
+        audience: ["企業", "社區", "學校"],
+        definition: "把思考分成事實、情緒、風險、利益、創意與統整六種角度，避免討論卡在單一立場。",
+        use: "適合企劃、決策、創新、社區方案討論。",
+        steps: ["說明六種思考角色", "每輪指定一頂帽子", "每個人只從該角度發言", "最後用藍帽統整決策"],
+        demo: "設計一場親子活動時，白帽列資源，紅帽說期待，黑帽找風險，黃帽找價值，綠帽想新玩法，藍帽排優先順序。",
+        tip: "先分離思考角度，再做整合，能減少討論中的互相否定。"
+      },
+      {
+        title: "案例教學法",
+        category: "案例情境",
+        className: "case",
+        goals: ["理解深化", "問題解決"],
+        audience: ["企業", "社區", "學校"],
+        definition: "以真實或改編案例作為學習材料，讓學員分析問題、做判斷並提出行動。",
+        use: "適合管理、服務、倫理、照護、職安、班級經營等課程。",
+        steps: ["提供背景與關鍵資訊", "請學員找問題與利害關係人", "小組提出處理方案", "講師補充原理與實務限制"],
+        demo: "企業服務課給一則客訴案例，請小組分辨事實、情緒、權限與補救方案，最後演練回覆顧客。",
+        tip: "好案例不一定要長，但要有張力、資訊不足與需要選擇的時刻。"
+      },
+      {
+        title: "情境模擬法",
+        category: "案例情境",
+        className: "case",
+        goals: ["技能練習", "問題解決"],
+        audience: ["企業", "社區", "學校"],
+        definition: "把真實工作或生活情境搬進教室，讓學員在接近真實的壓力下練習判斷與行動。",
+        use: "適合危機處理、服務接待、照護溝通、安全訓練、班級事件。",
+        steps: ["設計角色與任務", "給予情境限制", "學員進行模擬", "用觀察指標回饋與重來一次"],
+        demo: "在防詐課中，一人扮演來電詐騙者，一人扮演接電話者，其他人觀察話術警訊與拒絕技巧。",
+        tip: "模擬後一定要去角色化，讓學員離開剛才的情緒與身份。"
+      },
+      {
+        title: "角色扮演法",
+        category: "案例情境",
+        className: "case",
+        goals: ["技能練習", "態度改變"],
+        audience: ["企業", "社區", "學校"],
+        definition: "讓學員扮演不同人物，從對方位置理解需求、情緒與溝通策略。",
+        use: "適合銷售、諮詢、親師溝通、衝突處理、長照與服務課程。",
+        steps: ["分派角色與目標", "給三到五分鐘準備", "進行短時間演出", "請觀察者依規準回饋"],
+        demo: "親師溝通課中，一人扮演焦慮家長，一人扮演導師，練習先同理再說明具體作法。",
+        tip: "角色卡要寫出目標與情緒，不要只寫身份。"
+      },
+      {
+        title: "兩難情境法",
+        category: "案例情境",
+        className: "case",
+        goals: ["態度改變", "理解深化"],
+        audience: ["企業", "社區", "學校"],
+        definition: "設計沒有完美答案的情境，讓學員練習權衡價值、成本與責任。",
+        use: "適合倫理、領導、公民教育、醫療照護、社區資源分配。",
+        steps: ["提出兩難故事", "請學員站隊或投票", "分組說明理由", "加入新資訊後再次判斷"],
+        demo: "社區資源有限時，該優先支持獨居長者、弱勢兒少，還是照顧者喘息？讓學員說明選擇背後的價值。",
+        tip: "重點不是找正解，而是讓學員看見自己如何做價值排序。"
+      },
+      {
+        title: "事件重建法",
+        category: "案例情境",
+        className: "case",
+        goals: ["問題解決", "成效評量"],
+        audience: ["企業", "學校"],
+        definition: "把一個事件依時間線拆解，找出關鍵決策點、資訊落差與可預防因素。",
+        use: "適合職安、醫療安全、校園事件、專案失敗檢討。",
+        steps: ["列出事件時間線", "標記每個決策點", "分析當時資訊與限制", "提出下次可改變的系統設計"],
+        demo: "職安課可重建一次跌倒事故，從環境、流程、提醒、個人狀態找出多層預防措施。",
+        tip: "避免變成究責大會，焦點放在流程與系統如何變得更好。"
+      },
+      {
+        title: "積分制",
+        category: "遊戲化",
+        className: "game",
+        goals: ["參與動機", "成效評量"],
+        audience: ["企業", "社區", "學校"],
+        definition: "把學習行為轉化為可累積的分數，讓參與、合作、完成任務被看見。",
+        use: "適合系列課程、分組競賽、複習活動、工作坊任務。",
+        steps: ["定義可得分行為", "公開計分規則", "即時給分與回饋", "用分數換取小獎勵或特權"],
+        demo: "簡報課中，小組完成訪談得五分，提出好問題得三分，回饋他組得二分，最後兌換優先選題權。",
+        tip: "分數要鼓勵合作與進步，不只獎勵反應最快的人。"
+      },
+      {
+        title: "互動遊戲化",
+        category: "遊戲化",
+        className: "game",
+        goals: ["參與動機", "技能練習"],
+        audience: ["企業", "社區", "學校"],
+        definition: "接近結構遊戲化：在不大幅改變教材內容的前提下，把課堂互動、任務流程、回饋、合作與進度設計成帶有遊戲感的學習經驗。",
+        use: "適合原本內容已固定的企業內訓、法規課、健康宣導、講座與學校單元複習。",
+        steps: ["保留原本核心內容與學習目標", "找出需要提高參與的段落", "加入任務、回饋、選擇、合作或進度元素", "用反思與檢核把遊戲行為連回學習"],
+        demo: "防詐課不改教材內容，但把課程設成三關：辨識話術、判斷風險、演練拒絕。每關完成後取得下一張任務卡與團隊分數。",
+        tip: "互動遊戲化最怕只剩熱鬧。每個分數、關卡或任務都要對應一個學習行為。"
+      },
+      {
+        title: "內容遊戲化",
+        category: "遊戲化",
+        className: "game",
+        goals: ["理解深化", "問題解決"],
+        audience: ["企業", "社區", "學校"],
+        definition: "把教材內容本身改寫成故事、角色、挑戰、任務、選擇或情境，讓學員透過遊戲化內容理解概念與做出判斷。",
+        use: "適合抽象概念、流程判斷、倫理兩難、跨部門協作、社區議題與學生專題。",
+        steps: ["找出核心概念或流程", "設計故事背景與角色任務", "把知識點轉成選擇、線索或挑戰", "讓學員完成任務後整理概念與應用"],
+        demo: "把資安課改成公司資料外洩調查任務。學員扮演調查小組，從郵件、權限、密碼、雲端分享四條線索找出外洩原因。",
+        tip: "內容遊戲化比互動遊戲化更需要設計時間，但也更容易讓抽象知識變成可體驗的情境。"
+      },
+      {
+        title: "闖關制",
+        category: "遊戲化",
+        className: "game",
+        goals: ["參與動機", "技能練習"],
+        audience: ["企業", "社區", "學校"],
+        definition: "把課程拆成一連串任務關卡，學員完成一關後取得下一步線索或挑戰。",
+        use: "適合技能練習、知識複習、團隊合作、校園活動。",
+        steps: ["把學習目標拆成關卡", "每關設任務與通關標準", "安排提示與檢核", "最後用總任務整合學習"],
+        demo: "急救課可設四關：判斷意識、求救流程、胸外按壓、AED 圖卡排序，完成後進行情境演練。",
+        tip: "關卡難度要逐步增加，第一關最好讓多數人快速成功。"
+      },
+      {
+        title: "任務卡",
+        category: "遊戲化",
+        className: "game",
+        goals: ["參與動機", "技能練習"],
+        audience: ["企業", "社區", "學校"],
+        definition: "把學習要求寫成一張張任務卡，讓學員抽取、選擇或完成指定挑戰。",
+        use: "適合破冰、分組任務、桌遊化課程、反思收尾。",
+        steps: ["設計任務卡類型", "說明完成條件", "讓個人或小組抽卡", "完成後分享成果或獲得回饋"],
+        demo: "溝通課任務卡可寫：用一句話同理對方、把抱怨改成請求、問一個開放式問題。",
+        tip: "任務卡文字要短，最好一張卡只做一件事。"
+      },
+      {
+        title: "賓果複習",
+        category: "遊戲化",
+        className: "game",
+        goals: ["參與動機", "成效評量"],
+        audience: ["社區", "學校"],
+        definition: "把概念、題目或行為放入賓果格，讓學員在遊戲中完成回顧與檢核。",
+        use: "適合術語複習、健康知識、語言學習、課程收尾。",
+        steps: ["製作九宮格或十六宮格", "每格放一個概念或任務", "講師出題或學員互問", "連線者說明其中一格內容"],
+        demo: "健康課賓果格可放睡眠、飲水、肌力、藥袋、跌倒預防等概念，連線者要任選三格說明做法。",
+        tip: "中獎後要讓學員解釋格子內容，才不會只剩運氣。"
+      },
+      {
+        title: "桌遊教學法",
+        category: "遊戲化",
+        className: "game",
+        goals: ["參與動機", "問題解決"],
+        audience: ["企業", "社區", "學校"],
+        definition: "使用現成或自製桌遊，把抽象概念轉化成規則、資源、互動與決策。",
+        use: "適合財商、團隊合作、溝通、策略、社區議題與長者課程。",
+        steps: ["選擇對應學習目標的遊戲機制", "先短玩一輪", "暫停討論玩家策略", "連結到真實情境與行動"],
+        demo: "用資源交換遊戲教社區合作，玩家必須交換卡片完成共同任務，結束後討論信任與資訊不對稱。",
+        tip: "遊戲只是載體，解說與反思才是學習發生的地方。"
+      },
+      {
+        title: "密室逃脫",
+        category: "遊戲化",
+        className: "game",
+        goals: ["參與動機", "問題解決"],
+        audience: ["企業", "學校"],
+        definition: "把學習內容設計成線索、謎題與時間壓力，讓團隊合作解鎖最終任務。",
+        use: "適合安全教育、知識複習、團隊建立、專題導入。",
+        steps: ["設定故事任務", "把知識點轉成謎題", "安排提示機制", "通關後進行解謎回顧"],
+        demo: "資安課可設計一封釣魚信、一組弱密碼、一份權限表，學員解開後找出資料外洩原因。",
+        tip: "謎題不能只考腦筋急轉彎，必須真的需要用到課程知識。"
+      },
+      {
+        title: "電影教學法",
+        category: "影片媒體",
+        className: "media",
+        goals: ["理解深化", "態度改變"],
+        audience: ["企業", "社區", "學校"],
+        definition: "用電影或劇情片段呈現人性、情境與衝突，再引導學員觀察、討論與反思。",
+        use: "適合生命教育、倫理、溝通、領導、家庭、社區議題。",
+        steps: ["選擇三到十二分鐘片段", "給觀看任務", "播放到關鍵處暫停", "討論角色動機、選擇與替代作法"],
+        demo: "在同理心課中播放照顧者壓力片段，請學員分辨角色說出口的需求與沒說出口的需求。",
+        tip: "不要放完整電影取代教學，片段越精準，討論越有力。"
+      },
+      {
+        title: "影片暫停提問",
+        category: "影片媒體",
+        className: "media",
+        goals: ["參與動機", "理解深化"],
+        audience: ["企業", "社區", "學校"],
+        definition: "在影片關鍵點暫停，請學員預測、判斷或指出線索，讓觀看變成主動思考。",
+        use: "適合技能示範、案例觀察、媒體識讀、服務與安全訓練。",
+        steps: ["設定暫停點", "播放前交代觀察任務", "暫停並提問", "播放後驗證與整理"],
+        demo: "客訴影片中，在顧客情緒升高前暫停，問：你看到了哪三個升溫訊號？下一句怎麼回比較好？",
+        tip: "暫停點不要太多，三個關鍵點通常比十個小問題有效。"
+      },
+      {
+        title: "新聞事件教學",
+        category: "影片媒體",
+        className: "media",
+        goals: ["理解深化", "態度改變"],
+        audience: ["企業", "社區", "學校"],
+        definition: "用近期或具代表性的新聞事件連結課程概念，讓學習貼近真實社會。",
+        use: "適合公民教育、風險管理、媒體識讀、健康與安全議題。",
+        steps: ["挑選與主題相關事件", "提供事實摘要", "分辨事實、推測與立場", "討論個人或組織可採取的行動"],
+        demo: "防災課可用颱風災情新聞，分析個人準備、社區通報、政府資源與媒體資訊判讀。",
+        tip: "敏感議題要先查證來源並建立討論規範，避免錯誤資訊或人身攻擊。"
+      },
+      {
+        title: "圖像觀察法",
+        category: "影片媒體",
+        className: "media",
+        goals: ["參與動機", "態度改變"],
+        audience: ["社區", "學校"],
+        definition: "用一張圖片引發觀察、推論與感受表達，適合帶出隱性經驗與多元觀點。",
+        use: "適合美感教育、同理心、社區觀察、長者活動、語文表達。",
+        steps: ["展示一張清楚圖片", "先問看見什麼", "再問你如何知道", "最後問這讓你想到什麼"],
+        demo: "展示一張公園長椅照片，請學員說出使用者、可能問題與可改善設計。",
+        tip: "先談可觀察事實，再談推論與感受，討論會更扎實。"
+      },
+      {
+        title: "做中學",
+        category: "體驗實作",
+        className: "practice",
+        goals: ["技能練習", "理解深化"],
+        audience: ["企業", "社區", "學校"],
+        definition: "學員透過實際操作建構理解，而不是只聽講師解釋。",
+        use: "適合工具操作、技術訓練、手作、服務流程、數位技能。",
+        steps: ["講師示範最小步驟", "學員立即操作", "講師巡迴觀察", "針對常見錯誤再示範一次"],
+        demo: "簡報設計課先示範如何把一頁文字改成三層重點，學員馬上修改自己的投影片並互評。",
+        tip: "講授時間越短越好，讓學員盡快碰到真實材料。"
+      },
+      {
+        title: "工作坊教學",
+        category: "體驗實作",
+        className: "practice",
+        goals: ["技能練習", "問題解決"],
+        audience: ["企業", "社區", "學校"],
+        definition: "以產出為導向的課程形式，學員在講師引導下完成方案、作品或行動計畫。",
+        use: "適合教案設計、企劃、社區方案、團隊共創、教師研習。",
+        steps: ["定義最後產出", "分段提供工具與範例", "每段都讓學員產出一部分", "最後發表並修正"],
+        demo: "半日社區活動設計工作坊，從需求盤點、目標設定、活動流程到風險清單逐步完成。",
+        tip: "工作坊不是長演講加一張學習單，時間配置要讓產出真正發生。"
+      },
+      {
+        title: "問題導向學習",
+        category: "體驗實作",
+        className: "practice",
+        goals: ["問題解決", "理解深化"],
+        audience: ["企業", "社區", "學校"],
+        definition: "從真實或擬真的問題出發，學員自行釐清已知、未知與需要學習的內容。",
+        use: "適合醫療、管理、社區議題、科學探究、跨領域課程。",
+        steps: ["提出複雜問題", "列出已知與未知", "分工查找資料", "提出解法並說明依據"],
+        demo: "給學生一題：校園午餐剩食如何減少？小組調查原因、訪談利害關係人，再提出改善方案。",
+        tip: "問題要真實到沒有單一標準答案，才會迫使學員整合知識。"
+      },
+      {
+        title: "專題導向學習",
+        category: "體驗實作",
+        className: "practice",
+        goals: ["問題解決", "技能練習"],
+        audience: ["學校", "社區"],
+        definition: "以一段較長時間完成作品、研究或行動方案，強調歷程、合作與公開成果。",
+        use: "適合學期課程、社區營造、跨科整合、成果展。",
+        steps: ["設定驅動問題", "規劃時程與里程碑", "進行調查與製作", "公開發表並接受回饋"],
+        demo: "學生以如何讓校園更適合高齡者為題，完成訪談、地圖標記、改善提案與模型展示。",
+        tip: "要設里程碑與檢核點，否則專題容易拖到最後才趕工。"
+      },
+      {
+        title: "學習站",
+        category: "體驗實作",
+        className: "practice",
+        goals: ["參與動機", "技能練習"],
+        audience: ["社區", "學校"],
+        definition: "把課程拆成多個站點，學員輪流體驗不同任務或材料。",
+        use: "適合大班、多主題、健康促進、親子活動、校園闖關。",
+        steps: ["設計三到六個站點", "每站給明確任務", "小組定時輪站", "最後用學習單統整各站收穫"],
+        demo: "長者健康課設肌力站、營養站、藥袋站、防跌站，每站五分鐘完成一個小挑戰。",
+        tip: "每站要能獨立運作，指令最好印在桌上，減少講師重複說明。"
+      },
+      {
+        title: "田野調查",
+        category: "體驗實作",
+        className: "practice",
+        goals: ["問題解決", "態度改變"],
+        audience: ["社區", "學校"],
+        definition: "讓學員走進真實場域觀察、訪談、紀錄，從現場資料建立理解。",
+        use: "適合社區課程、公民教育、地方創生、設計思考。",
+        steps: ["設定調查問題", "設計觀察或訪談表", "進入場域蒐集資料", "回到課堂整理洞察"],
+        demo: "社區講師可帶學員觀察市場動線、無障礙設施與長者休息點，再討論友善社區改善方案。",
+        tip: "調查前要教基本倫理，例如徵得同意、不拍攝敏感資訊。"
+      },
+      {
+        title: "拼圖法",
+        category: "合作學習",
+        className: "coop",
+        goals: ["理解深化", "參與動機"],
+        audience: ["企業", "學校"],
+        definition: "每位學員負責學習一部分內容，回到原組教會同伴，讓每個人都成為必要的一塊拼圖。",
+        use: "適合文本閱讀、法規、理論架構、多面向議題。",
+        steps: ["把材料分成幾個主題", "同主題成員先成為專家", "回原組互教", "用整合任務檢查全組理解"],
+        demo: "教師研習中，四組分別研讀差異化教學、評量、班級經營、科技工具，再回原組設計一堂課。",
+        tip: "最後一定要有整合任務，避免大家只聽到零散片段。"
+      },
+      {
+        title: "同儕教學",
+        category: "合作學習",
+        className: "coop",
+        goals: ["理解深化", "技能練習"],
+        audience: ["企業", "社區", "學校"],
+        definition: "讓學員向同伴解釋概念或示範技能，透過教別人加深自己的理解。",
+        use: "適合複習、技能練習、語言表達、數位工具操作。",
+        steps: ["分派教學小任務", "提供簡短教學架構", "學員互教互練", "講師補充關鍵觀念"],
+        demo: "手機攝影課讓學員兩兩互教自己最熟的一個功能，例如對焦、曝光、構圖或修圖。",
+        tip: "要給學員教學腳手架，例如先說目的、再示範、最後讓同伴做一次。"
+      },
+      {
+        title: "互評法",
+        category: "合作學習",
+        className: "coop",
+        goals: ["技能練習", "成效評量"],
+        audience: ["企業", "學校"],
+        definition: "學員依照規準給彼此回饋，學會辨識品質並修正自己的作品。",
+        use: "適合簡報、寫作、作品、教案、企劃書與專題成果。",
+        steps: ["提供明確評分規準", "先示範如何給回饋", "學員交換作品", "根據回饋修正再提交"],
+        demo: "簡報課互評規準含訊息清楚、視覺層次、例子具體、結尾行動。每人給一個亮點與一個建議。",
+        tip: "先練習描述事實，再給建議，回饋會更專業。"
+      },
+      {
+        title: "圓桌分享",
+        category: "合作學習",
+        className: "coop",
+        goals: ["參與動機", "態度改變"],
+        audience: ["社區", "學校"],
+        definition: "每個人依序分享觀點、經驗或感受，確保發言機會平均。",
+        use: "適合社區課、生命教育、長者活動、班級經營與課程結尾。",
+        steps: ["設定一句可回答的題目", "每人限時發言", "其他人只聽不插話", "最後整理共同主題"],
+        demo: "課程結尾請每人說：今天我想帶回生活中的一個提醒是什麼？講師把答案整理成三類。",
+        tip: "題目要安全且具體，初次團體不宜一開始就問太私密的問題。"
+      },
+      {
+        title: "3-2-1 回饋",
+        category: "反思回饋",
+        className: "reflect",
+        goals: ["理解深化", "成效評量"],
+        audience: ["企業", "社區", "學校"],
+        definition: "用三個收穫、兩個疑問、一個行動快速整理學習，適合課程收尾。",
+        use: "適合演講、工作坊、學校課堂、線上課程。",
+        steps: ["發下紙本或線上表單", "請學員寫 3 個收穫", "再寫 2 個疑問", "最後寫 1 個行動承諾"],
+        demo: "防詐課結尾請學員寫三個警訊、兩個還不確定的問題、一個回家會提醒家人的行動。",
+        tip: "把疑問留作下次課開場或課後補充，學員會感覺回饋真的被使用。"
+      },
+      {
+        title: "Exit Ticket",
+        category: "反思回饋",
+        className: "reflect",
+        goals: ["成效評量", "理解深化"],
+        audience: ["企業", "社區", "學校"],
+        definition: "學員離開教室前交出一張簡短回應，讓講師掌握理解程度與下一步需求。",
+        use: "適合每堂課結尾、密集訓練每日收束、演講後檢核。",
+        steps: ["給一到兩個短問題", "限制一分鐘內完成", "收回後快速分類", "下次課回應共通問題"],
+        demo: "題目可為：今天最有用的一句話是什麼？你還想知道哪一件事？",
+        tip: "問題越短越好，否則學員會把它當成問卷而不是學習收束。"
+      },
+      {
+        title: "行動承諾卡",
+        category: "反思回饋",
+        className: "reflect",
+        goals: ["態度改變", "技能練習"],
+        audience: ["企業", "社區", "學校"],
+        definition: "讓學員把課後要做的一件事寫成具體承諾，推動學習轉移到生活或工作。",
+        use: "適合企業訓練、健康促進、親職教育、教師研習。",
+        steps: ["請學員選一個最想應用的重點", "寫成可觀察行動", "加上時間與對象", "邀請自願者公開分享"],
+        demo: "溝通課承諾卡：這週五前，我會在一次會議中先複述對方需求，再提出我的建議。",
+        tip: "承諾要小到真的能做，太宏大的承諾通常不會發生。"
+      },
+      {
+        title: "反思日誌",
+        category: "反思回饋",
+        className: "reflect",
+        goals: ["態度改變", "理解深化"],
+        audience: ["社區", "學校"],
+        definition: "用連續書寫記錄學習、感受、疑問與應用，讓經驗逐漸轉化成個人理解。",
+        use: "適合生命教育、服務學習、長期課程、專題學習。",
+        steps: ["提供固定反思問題", "每次課後書寫", "定期回看與摘錄", "用日誌內容進行個別或小組分享"],
+        demo: "服務學習後請學生寫：我看見了什麼需求？我原本的想像有什麼改變？下次我會怎麼做？",
+        tip: "反思問題要從描述、感受、意義、行動逐步推進。"
+      },
+      {
+        title: "心智圖",
+        category: "創意表達",
+        className: "creative",
+        goals: ["理解深化", "問題解決"],
+        audience: ["企業", "社區", "學校"],
+        definition: "以中心主題向外發散關鍵概念，協助學員整理知識、看見關聯與產生想法。",
+        use: "適合知識整理、企劃發想、讀書會、課前盤點。",
+        steps: ["寫下中心主題", "向外分出主要分支", "每個分支再加入細節", "圈選最重要或最可行的內容"],
+        demo: "活動企劃課以成功的社區活動為中心，分出對象、內容、資源、宣傳、風險五個分支。",
+        tip: "先發散再整理，不要一開始就要求圖很漂亮。"
+      },
+      {
+        title: "故事教學法",
+        category: "創意表達",
+        className: "creative",
+        goals: ["態度改變", "理解深化"],
+        audience: ["企業", "社區", "學校"],
+        definition: "透過故事中的人物、衝突與轉折帶出概念，使抽象道理更容易記住與共感。",
+        use: "適合價值觀、品牌、領導、生命教育、社區倡議。",
+        steps: ["選一個貼近主題的故事", "說出角色困境", "停在選擇點讓學員判斷", "揭示結果並連結概念"],
+        demo: "領導課可講一位主管如何從直接下命令改成提問授權，再請學員找出轉變關鍵。",
+        tip: "故事不必戲劇化，但必須有具體人物與選擇。"
+      },
+      {
+        title: "設計思考",
+        category: "創意表達",
+        className: "creative",
+        goals: ["問題解決", "態度改變"],
+        audience: ["企業", "社區", "學校"],
+        definition: "從使用者需求出發，經歷同理、定義、發想、原型與測試，產生更貼近真實需求的方案。",
+        use: "適合服務設計、產品改善、教案設計、社區創新。",
+        steps: ["訪談或觀察使用者", "定義真正問題", "大量發想解法", "製作低成本原型", "測試後修正"],
+        demo: "為長者設計手機課時，先訪談長者卡在哪裡，再做一張大字版操作卡並現場測試。",
+        tip: "不要跳過同理階段，否則容易設計出講師自己喜歡但學員不需要的方案。"
+      },
+      {
+        title: "Gallery Walk",
+        category: "創意表達",
+        className: "creative",
+        goals: ["參與動機", "成效評量"],
+        audience: ["企業", "社區", "學校"],
+        definition: "各組把成果貼在牆面或桌上，其他學員走動觀看、留言與提問。",
+        use: "適合小組成果、海報、企劃草案、教案、專題中期回饋。",
+        steps: ["各組完成可展示成果", "貼上回饋便利貼規則", "學員走動觀摩", "各組帶回回饋修正"],
+        demo: "教案工作坊中，各組貼出活動流程，其他組留下兩張便利貼：一張亮點，一張疑問。",
+        tip: "給明確回饋句型，留言品質會比自由留言好很多。"
+      },
+      {
+        title: "即時投票",
+        category: "科技互動",
+        className: "tech",
+        goals: ["參與動機", "成效評量"],
+        audience: ["企業", "社區", "學校"],
+        definition: "用手機或線上工具即時收集選擇、意見或理解程度，讓全班狀態可視化。",
+        use: "適合大班演講、線上課、混成課、敏感議題匿名表態。",
+        steps: ["設計單選或量表題", "讓學員掃碼作答", "顯示結果", "根據分布追問原因或調整教學"],
+        demo: "在壓力管理課問：你現在的壓力分數是幾分？看結果後分組討論高分與低分者的壓力來源差異。",
+        tip: "投票後一定要解讀，不要讓結果只是螢幕上的圖。"
+      },
+      {
+        title: "線上搶答",
+        category: "科技互動",
+        className: "tech",
+        goals: ["參與動機", "成效評量"],
+        audience: ["企業", "學校"],
+        definition: "透過 Kahoot、Quizizz 等工具進行題目競賽，用節奏與回饋提升複習動機。",
+        use: "適合知識複習、術語辨識、課前測驗、課後檢核。",
+        steps: ["把重點轉成選擇題", "設定題目時間", "進行個人或小組搶答", "每題後補充易錯觀念"],
+        demo: "資安課設十題釣魚信判斷題，每題後立即說明關鍵線索。",
+        tip: "題目要測概念，不只測記憶。競賽中也要保留講解時間。"
+      },
+      {
+        title: "翻轉教室",
+        category: "科技互動",
+        className: "tech",
+        goals: ["理解深化", "技能練習"],
+        audience: ["企業", "學校"],
+        definition: "把基礎知識放到課前自學，課堂時間用於討論、練習、應用與回饋。",
+        use: "適合技能課、進階討論、企業培訓、學校單元教學。",
+        steps: ["提供課前影片或閱讀", "用小測確認準備狀態", "課堂進行任務或案例", "針對困難點補救教學"],
+        demo: "Excel 課前看樞紐分析影片，課堂直接用真實資料完成報表並解決學員卡住的問題。",
+        tip: "課前材料要短，課堂一開始要有檢核，否則學員可能沒有準備。"
+      },
+      {
+        title: "AI 輔助學習",
+        category: "科技互動",
+        className: "tech",
+        goals: ["問題解決", "技能練習"],
+        audience: ["企業", "學校"],
+        definition: "讓學員使用 AI 產生草稿、比較方案、練習對話或整理資料，再進行判斷、修正與反思。",
+        use: "適合寫作、企劃、語言、教案、資料整理與角色演練。",
+        steps: ["給清楚任務與提示格式", "讓 AI 產生初稿或回饋", "學員檢查錯誤與偏見", "修正成自己的成果"],
+        demo: "企劃課讓學員請 AI 產出三個活動方案，再用目標對象、預算、風險三個指標評選與修改。",
+        tip: "AI 不是代替學習，而是提供可批判的材料。要把查核、引用來源與修正列為任務。"
+      },
+      {
+        title: "前測後測",
+        category: "評量檢核",
+        className: "assess",
+        goals: ["成效評量"],
+        audience: ["企業", "社區", "學校"],
+        definition: "課前與課後用相似題目測量知識、信心或能力變化，讓學習成效可被看見。",
+        use: "適合企業內訓成效、健康教育、知識型課程、專案評估。",
+        steps: ["設計對應目標的題目", "課前先測", "課程中針對弱點教學", "課後再測並比較變化"],
+        demo: "防跌課前後都請長者判斷居家風險圖，課後比較能辨識出的風險數量。",
+        tip: "題目要對應真正教學目標，不要只測容易量化但不重要的內容。"
+      },
+      {
+        title: "Rubric 評分規準",
+        category: "評量檢核",
+        className: "assess",
+        goals: ["成效評量", "技能練習"],
+        audience: ["企業", "學校"],
+        definition: "用明確等級描述作品或表現品質，讓評量透明，也讓學員知道如何改善。",
+        use: "適合簡報、專題、企劃、教案、表達與實作任務。",
+        steps: ["列出三到五個評量面向", "為每個面向描述等級", "課前公開規準", "用規準回饋與修正"],
+        demo: "簡報 Rubric 可含內容聚焦、結構清楚、視覺輔助、口語表達、時間掌握五項。",
+        tip: "每個等級要描述可觀察行為，不要只寫很好、普通、需加強。"
+      },
+      {
+        title: "實作評量",
+        category: "評量檢核",
+        className: "assess",
+        goals: ["技能練習", "成效評量"],
+        audience: ["企業", "社區", "學校"],
+        definition: "透過真實操作或任務成果判斷學員是否能做出目標行為。",
+        use: "適合技能訓練、工具操作、照護、急救、服務與表達課程。",
+        steps: ["定義合格表現", "設計接近真實的任務", "觀察操作歷程", "給具體回饋並允許再試一次"],
+        demo: "急救課不只考選擇題，而是讓學員完成呼叫求助、按壓位置、頻率與 AED 流程。",
+        tip: "實作評量要看過程與結果，尤其是安全相關技能。"
+      },
+      {
+        title: "觀察紀錄",
+        category: "評量檢核",
+        className: "assess",
+        goals: ["成效評量", "態度改變"],
+        audience: ["企業", "學校"],
+        definition: "講師或觀察者依照指標記錄學員在活動中的行為，以補足測驗看不到的能力。",
+        use: "適合合作、溝通、領導、班級經營、服務態度訓練。",
+        steps: ["設定觀察指標", "活動中做簡短紀錄", "找出具體行為證據", "活動後給回饋或作為評量依據"],
+        demo: "團隊活動中觀察誰提出問題、誰整合意見、誰邀請沉默者發言，作為團隊溝通回饋。",
+        tip: "一次觀察三到五個指標就好，太多會記不準。"
+      },
+      {
+        title: "檢索練習",
+        category: "學習科學",
+        className: "learning",
+        goals: ["理解深化", "成效評量"],
+        audience: ["企業", "社區", "學校"],
+        definition: "讓學員不看教材，主動從記憶中取回答案、步驟或概念，藉由提取而強化學習。",
+        use: "適合知識複習、技能流程、證照訓練、健康教育、課程開場與收尾。",
+        steps: ["先移開教材或投影片", "提出低風險回想題", "讓學員個人作答", "公布答案並補充易錯點"],
+        demo: "防詐課結尾請學員不看講義寫出三個詐騙警訊，再兩人互相補充漏掉的線索。",
+        tip: "檢索練習不是考倒學員，而是用低壓方式讓大腦練習把知識取出來。"
+      },
+      {
+        title: "間隔練習",
+        category: "學習科學",
+        className: "learning",
+        goals: ["理解深化", "成效評量"],
+        audience: ["企業", "社區", "學校"],
+        definition: "把同一個重點分散到不同時間重複取回與應用，而不是一次密集塞滿。",
+        use: "適合長期課程、語言、法規、職安、健康行為、企業新人訓練。",
+        steps: ["列出需要長期記住的重點", "安排課前、課中、課後重複出現", "每次用不同題型或情境", "追蹤哪些概念需要再回收"],
+        demo: "新人訓練可在第一天、第三天、第二週各安排一次資安情境判斷題，讓密碼、釣魚信、資料外洩重點反覆取回。",
+        tip: "間隔的重點不是重講一遍，而是讓學員隔一段時間再重新想起來。"
+      },
+      {
+        title: "交錯練習",
+        category: "學習科學",
+        className: "learning",
+        goals: ["理解深化", "問題解決"],
+        audience: ["企業", "學校"],
+        definition: "把相近但容易混淆的題型、情境或技能混合練習，訓練學員辨識差異與選擇策略。",
+        use: "適合數學題型、法規判斷、溝通回應、銷售情境、醫療與安全判斷。",
+        steps: ["選三到四個容易混淆的概念", "先各自示範一次", "再混合出題或混合情境", "請學員說明為什麼選這個方法"],
+        demo: "溝通課把同理、澄清、界線、請求四種回應混在案例裡，請學員判斷每句話最適合哪一種。",
+        tip: "交錯練習一開始會比較吃力，但很適合培養遷移與現場判斷。"
+      },
+      {
+        title: "同儕概念測驗",
+        category: "合作學習",
+        className: "coop",
+        goals: ["理解深化", "成效評量"],
+        audience: ["企業", "學校"],
+        definition: "學員先個別回答概念題，再與不同答案的同伴討論，最後重新作答，讓錯誤概念浮出來。",
+        use: "適合理論課、法規課、科學概念、企業制度、專業判斷。",
+        steps: ["出一道容易引發誤解的概念題", "個人先投票或作答", "找不同答案者討論理由", "再次作答並由講師統整"],
+        demo: "職場性騷擾防治課先問一題邊界模糊案例，學員個別投票後討論，再重新選擇並對照法規重點。",
+        tip: "題目要考概念判斷，不要只是查記憶；第二次作答的變化是很好的教學線索。"
+      },
+      {
+        title: "精熟學習",
+        category: "學習科學",
+        className: "learning",
+        goals: ["技能練習", "成效評量"],
+        audience: ["企業", "學校"],
+        definition: "學員必須達到明確的精熟標準後才進到下一步，未達標者獲得補救、練習與再次檢核。",
+        use: "適合安全技能、操作流程、證照訓練、數位工具、基礎能力補強。",
+        steps: ["定義精熟標準", "提供示範與練習", "用短測或實作檢核", "未達標者補救後再測"],
+        demo: "AED 教學中，學員需完成確認安全、呼叫支援、貼片位置、聽從指示四項標準，通過才進入完整情境演練。",
+        tip: "精熟學習要搭配補救活動，不只是把沒通過的人留下來再考一次。"
+      },
+      {
+        title: "刻意練習",
+        category: "體驗實作",
+        className: "practice",
+        goals: ["技能練習", "成效評量"],
+        audience: ["企業", "社區", "學校"],
+        definition: "針對技能中的薄弱環節進行高專注、小範圍、可回饋的反覆練習。",
+        use: "適合簡報、口語表達、諮詢、服務、運動、手作與工具操作。",
+        steps: ["拆出一個具體微技能", "示範成功標準", "短時間重複練習", "立即回饋並調整下一輪"],
+        demo: "簡報課不練完整簡報，先專練 30 秒開場鉤子，每輪只回饋語速、停頓與聽眾連結。",
+        tip: "刻意練習通常不輕鬆，講師要把任務切小，讓學員看見自己每輪有進步。"
+      },
+      {
+        title: "範例研讀與漸退",
+        category: "學習科學",
+        className: "learning",
+        goals: ["理解深化", "技能練習"],
+        audience: ["企業", "學校"],
+        definition: "先讓學員研讀完整範例，再逐步拿掉部分步驟，最後由學員獨立完成。",
+        use: "適合解題、企劃書、簡報設計、寫作、SOP、資料分析。",
+        steps: ["提供高品質完整範例", "標註每一步的判斷理由", "改成半完成範例讓學員補空", "最後給新任務獨立完成"],
+        demo: "企劃課先拆解一份完整活動企劃，再給半完成表格讓學員補目標、流程、風險，最後設計自己的方案。",
+        tip: "範例要揭露思考過程，不只是展示漂亮成品。"
+      },
+      {
+        title: "鷹架教學",
+        category: "包容設計",
+        className: "inclusive",
+        goals: ["技能練習", "理解深化"],
+        audience: ["企業", "社區", "學校"],
+        definition: "講師先提供提示、表格、句型、步驟或範例支撐學習，隨著能力增加逐步撤除支援。",
+        use: "適合新手技能、長者數位學習、語言表達、專題製作、困難概念。",
+        steps: ["判斷學員目前能做到哪裡", "提供剛好足夠的支援", "讓學員在支援下完成任務", "逐步減少提示直到能獨立完成"],
+        demo: "手機課一開始給大字步驟卡，第二輪只給圖示提示，第三輪請學員不看卡片完成加入 LINE 好友。",
+        tip: "支援太少會挫折，支援太多會依賴；關鍵是逐步撤除。"
+      },
+      {
+        title: "通用學習設計",
+        category: "包容設計",
+        className: "inclusive",
+        goals: ["參與動機", "態度改變"],
+        audience: ["企業", "社區", "學校"],
+        definition: "從一開始就用多元參與、多元呈現與多元表達設計課程，降低不同學員的學習障礙。",
+        use: "適合混齡、跨文化、身心需求多元、線上混成、社區與成人課程。",
+        steps: ["檢查學員可能遇到的障礙", "提供多種接收資訊方式", "提供多種參與與表達方式", "用回饋持續調整材料與活動"],
+        demo: "社區健康課同時提供口頭說明、圖片版步驟、實物示範與小組互助，成果可用口說、圖卡或行動承諾呈現。",
+        tip: "通用設計不是降低標準，而是提供更多路徑讓學員達到同一個核心目標。"
+      },
+      {
+        title: "差異化教學",
+        category: "包容設計",
+        className: "inclusive",
+        goals: ["參與動機", "理解深化"],
+        audience: ["企業", "社區", "學校"],
+        definition: "依學員準備度、興趣或學習需求調整內容、過程、產出或支援方式。",
+        use: "適合程度差異大的班級、企業跨部門訓練、社區混齡課程、補救與進階並行。",
+        steps: ["先用前測或觀察掌握差異", "設計基本任務與挑戰任務", "提供選擇或分層材料", "用共同標準檢核核心學習"],
+        demo: "Excel 課把任務分成基本排序、樞紐分析、儀表板三層，學員依程度選擇，但都要能解讀資料結論。",
+        tip: "差異化不是替每個人做一套課，而是準備幾條合理路徑。"
+      },
+      {
+        title: "學習細胞",
+        category: "合作學習",
+        className: "coop",
+        goals: ["理解深化", "參與動機"],
+        audience: ["企業", "學校"],
+        definition: "兩位學員輪流根據閱讀或教材提出問題並回答，讓理解在互問互答中被檢查。",
+        use: "適合文本閱讀、法規、理論、影片觀後、課前預習討論。",
+        steps: ["課前要求每人準備兩個問題", "課堂兩兩配對", "輪流提問、回答與追問", "挑選共通問題回到全班討論"],
+        demo: "教師研習前讀一篇差異化教學短文，課堂兩人互問：文中哪個策略最可行？哪個最難落地？",
+        tip: "問題品質決定活動品質，可以先提供問題句型讓學員學會發問。"
+      },
+      {
+        title: "學生出題法",
+        category: "評量檢核",
+        className: "assess",
+        goals: ["理解深化", "成效評量"],
+        audience: ["企業", "學校"],
+        definition: "讓學員根據課程重點設計題目與答案，透過出題暴露自己對概念的理解深度。",
+        use: "適合考前複習、法規、專業知識、閱讀課、企業制度訓練。",
+        steps: ["公布出題範圍與題型", "學員個人或小組出題", "交換作答並修題", "講師挑選好題進行全班檢討"],
+        demo: "資安課讓小組設計一題釣魚信判斷題，必須附上正確答案與三個辨識線索。",
+        tip: "要求學員寫出解析，才看得出他們是否真正理解。"
+      },
+      {
+        title: "概念變化教學",
+        category: "學習科學",
+        className: "learning",
+        goals: ["理解深化", "態度改變"],
+        audience: ["企業", "社區", "學校"],
+        definition: "先引出學員原有迷思或錯誤信念，再用衝突案例、證據與新模型協助修正理解。",
+        use: "適合健康迷思、安全觀念、科學概念、管理盲點、媒體識讀。",
+        steps: ["先讓學員表態原本想法", "提出反例或衝突情境", "引導比較舊想法與新證據", "讓學員用新概念解釋另一個案例"],
+        demo: "健康課先問感冒是否一定要吃抗生素，再用病毒與細菌案例比較，最後請學員判斷何時該就醫。",
+        tip: "不要只說學員錯了；要讓他們看見舊觀念在哪些情境下解釋不了。"
+      },
+      {
+        title: "後設認知檢核",
+        category: "反思回饋",
+        className: "reflect",
+        goals: ["理解深化", "成效評量"],
+        audience: ["企業", "社區", "學校"],
+        definition: "讓學員檢查自己知道什麼、不知道什麼、用什麼策略學習，以及下一步要如何調整。",
+        use: "適合自主學習、專題、考前複習、職能訓練、長期課程。",
+        steps: ["請學員估計自己的理解程度", "列出最不確定的部分", "選擇下一步學習策略", "過一段時間回看是否改善"],
+        demo: "課程中段請學員用紅黃綠標記每個概念的掌握度，紅色概念要寫下要問誰、查什麼、練哪一題。",
+        tip: "後設認知不是寫心得而已，而是幫學員更精準地管理自己的學習。"
+      }
+    ];
+
+    const grid = document.querySelector("#cardGrid");
+    const chips = document.querySelector("#categoryChips");
+    const searchInput = document.querySelector("#searchInput");
+    const goalFilter = document.querySelector("#goalFilter");
+    const audienceFilter = document.querySelector("#audienceFilter");
+    const resultTitle = document.querySelector("#resultTitle");
+    const resultMeta = document.querySelector("#resultMeta");
+    const emptyState = document.querySelector("#emptyState");
+    const modal = document.querySelector("#modal");
+    const closeModal = document.querySelector("#closeModal");
+    const topicInput = document.querySelector("#topicInput");
+    const audienceInput = document.querySelector("#audienceInput");
+    const outcomeInput = document.querySelector("#outcomeInput");
+    const selectedMethods = document.querySelector("#selectedMethods");
+    const promptPreview = document.querySelector("#promptPreview");
+    const promptStatus = document.querySelector("#promptStatus");
+    const copyPrompt = document.querySelector("#copyPrompt");
+    const floatingTray = document.querySelector("#floatingTray");
+    const floatingCount = document.querySelector("#floatingCount");
+    const selectedTitles = new Set();
+    let activeCategory = "全部";
+
+    function renderChips() {
+      chips.innerHTML = categories.map(([label]) => (
+        `<button class="chip" type="button" data-category="${label}" aria-pressed="${label === activeCategory}">${label}</button>`
+      )).join("");
+    }
+
+    function methodText(item) {
+      return [
+        item.title,
+        item.category,
+        item.definition,
+        item.use,
+        item.demo,
+        item.tip,
+        item.goals.join(" "),
+        item.audience.join(" ")
+      ].join(" ").toLowerCase();
+    }
+
+    function filteredMethods() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      const goal = goalFilter.value;
+      const audience = audienceFilter.value;
+      return methods.filter(item => {
+        const categoryMatch = activeCategory === "全部" || item.category === activeCategory;
+        const goalMatch = goal === "全部" || item.goals.includes(goal);
+        const audienceMatch = audience === "全部" || item.audience.includes(audience);
+        const keywordMatch = !keyword || methodText(item).includes(keyword);
+        return categoryMatch && goalMatch && audienceMatch && keywordMatch;
+      });
+    }
+
+    function renderCards() {
+      const items = filteredMethods();
+      grid.innerHTML = items.map((item, index) => `
+        <article class="card" tabindex="0" data-title="${item.title}" aria-label="開啟${item.title}知識圖卡">
+          <div class="card-top">
+            <span class="tag ${item.className}">${item.category}</span>
+            <button class="select-card ${selectedTitles.has(item.title) ? "selected" : ""}" type="button" data-select="${item.title}">
+              ${selectedTitles.has(item.title) ? "已加入" : "加入設計"}
+            </button>
+          </div>
+          <div>
+            <h3>${item.title}</h3>
+            <p>${item.definition}</p>
+          </div>
+          <div class="meta">
+            ${item.audience.map(a => `<span class="pill">${a}</span>`).join("")}
+            ${item.goals.slice(1).map(g => `<span class="pill">${g}</span>`).join("")}
+          </div>
+        </article>
+      `).join("");
+
+      resultTitle.textContent = activeCategory === "全部" ? "全部教學法" : activeCategory;
+      resultMeta.textContent = `顯示 ${items.length} 張知識圖卡，共 ${methods.length} 張。`;
+      emptyState.style.display = items.length ? "none" : "block";
+    }
+
+    function selectedItems() {
+      return methods.filter(item => selectedTitles.has(item.title));
+    }
+
+    function buildPrompt() {
+      const topic = topicInput.value.trim() || "請在這裡填入課程主題";
+      const audience = audienceInput.value.trim() || "請自行假設合理的學習對象、人數、時間與場地限制";
+      const outcomes = outcomeInput.value.trim() || "請根據課程主題設定 2 到 3 個可觀察、可評量的學習成果";
+      const cards = selectedItems();
+      const methodBlock = cards.length
+        ? cards.map((item, index) => [
+            `${index + 1}. ${item.title}`,
+            `定義：${item.definition}`,
+            `適合應用：${item.use}`,
+            `操作步驟：${item.steps.join(" / ")}`,
+            `示範活動：${item.demo}`,
+            `講師提醒：${item.tip}`
+          ].join("\n")).join("\n\n")
+        : "尚未指定教學法。請先根據主題推薦 3 到 5 種適合的互動式或遊戲化教學法。";
+
+      return `你是一位資深企業講師、社區講師與學校教師培訓顧問。請根據以下資訊，幫我設計一份可直接執行的互動式教學方案。\n\n課程主題：${topic}\n對象與限制：${audience}\n學習目標與期待成果：${outcomes}\n\n我想使用的教學圖卡：\n${methodBlock}\n\n請先做「適配檢查」：\n- 判斷我選的教學圖卡是否適合這個主題、對象、時間與限制。\n- 如果某張圖卡不適合，請說明原因，並建議更合適的替代教學法。\n- 如果我選太多方法，請幫我收斂成最適合的 3 到 5 個方法。\n\n請輸出以下內容：\n1. 課程定位：用 3 句話說明這堂課要解決什麼學習問題、適合誰、最後要產出什麼。\n2. 課程目標：列出 3 個可觀察、可評量的學習目標。\n3. 教學法搭配理由：說明每一張圖卡放在課程哪一段、為什麼適合、要避免什麼誤用。\n4. 課程流程：用表格呈現時間、活動名稱、使用圖卡、講師做什麼、學員做什麼、所需材料。\n5. 詳細活動設計：每個活動都要包含引導語、操作步驟、分組方式、時間配置、講師觀察重點。\n6. 示範話術：提供講師可以直接照著說的開場、轉場、提問、回饋與收尾話術。\n7. 互動與遊戲化設計：請區分互動遊戲化與內容遊戲化；說明哪些設計是提高參與、回饋與流程動機，哪些設計是把教材內容改寫成故事、角色、任務或情境，並避免只變成玩遊戲。\n8. 評量方式：設計課前、課中、課後的檢核方式，並對應到學習目標。\n9. 包容與安全調整：考量不同程度、安靜學員、行動不便、手機不熟、文化或敏感議題，提出調整方式。\n10. 備用方案：如果時間不足、學員太安靜、設備不能用、現場人數比預期多或少，分別怎麼調整。\n\n請用繁體中文，語氣務實清楚，避免空泛口號。內容要能讓講師直接拿去備課與現場執行。`;
+    }
+
+    function renderSelectedMethods() {
+      const cards = selectedItems();
+      selectedMethods.innerHTML = cards.length
+        ? cards.map(item => `<button type="button" data-remove="${item.title}" title="移除${item.title}">${item.title} ×</button>`).join("")
+        : `<span class="pill">尚未選擇</span>`;
+      floatingTray.hidden = cards.length === 0;
+      floatingCount.textContent = `已選 ${cards.length} 張圖卡`;
+    }
+
+    function updatePrompt() {
+      promptPreview.value = buildPrompt();
+      renderSelectedMethods();
+    }
+
+    function toggleMethod(title) {
+      if (selectedTitles.has(title)) {
+        selectedTitles.delete(title);
+      } else {
+        selectedTitles.add(title);
+      }
+      renderCards();
+      updatePrompt();
+      promptStatus.textContent = selectedTitles.has(title) ? `已加入「${title}」。` : `已移除「${title}」。`;
+    }
+
+    async function copyPromptText() {
+      const prompt = buildPrompt();
+      promptPreview.value = prompt;
+      try {
+        await navigator.clipboard.writeText(prompt);
+        promptStatus.textContent = "Prompt 已複製。";
+        return true;
+      } catch (error) {
+        promptPreview.focus();
+        promptPreview.select();
+        promptStatus.textContent = "瀏覽器不允許自動複製，已選取 Prompt，請手動複製。";
+        return false;
+      }
+    }
+
+    async function openAiTool(service) {
+      const prompt = buildPrompt();
+      await copyPromptText("backup");
+      const encoded = encodeURIComponent(prompt);
+      const links = {
+        chatgpt: {
+          base: "https://chatgpt.com/",
+          withPrompt: `https://chatgpt.com/?q=${encoded}`
+        },
+        gemini: {
+          base: "https://gemini.google.com/app",
+          withPrompt: `https://gemini.google.com/app?prompt=${encoded}`
+        },
+        claude: {
+          base: "https://claude.ai/new",
+          withPrompt: `https://claude.ai/new?q=${encoded}`
+        }
+      };
+      const target = encoded.length > 3200 ? links[service].base : links[service].withPrompt;
+      window.open(target, "_blank", "noopener,noreferrer");
+      promptStatus.textContent = encoded.length > 3200
+        ? "Prompt 已複製。內容較長，已開啟 AI 工具首頁，請直接貼上。"
+        : "已嘗試把 Prompt 帶入新對話，並已同步複製作為備援。";
+    }
+
+    function openCard(title) {
+      const item = methods.find(method => method.title === title);
+      if (!item) return;
+      document.querySelector("#modalTag").textContent = item.category;
+      document.querySelector("#modalTag").className = `tag ${item.className}`;
+      document.querySelector("#modalTitle").textContent = item.title;
+      document.querySelector("#modalDefinition").textContent = item.definition;
+      document.querySelector("#modalUse").textContent = item.use;
+      document.querySelector("#modalTip").textContent = item.tip;
+      document.querySelector("#modalDemo").textContent = item.demo;
+      document.querySelector("#modalSteps").innerHTML = item.steps.map(step => `<li>${step}</li>`).join("");
+      document.querySelector("#modalMeta").innerHTML = [
+        ...item.audience.map(a => `<span class="pill">${a}</span>`),
+        ...item.goals.map(g => `<span class="pill">${g}</span>`)
+      ].join("");
+      modal.classList.add("open");
+      closeModal.focus();
+    }
+
+    chips.addEventListener("click", event => {
+      const button = event.target.closest("button");
+      if (!button) return;
+      activeCategory = button.dataset.category;
+      renderChips();
+      renderCards();
+    });
+
+    grid.addEventListener("click", event => {
+      const selectButton = event.target.closest("[data-select]");
+      if (selectButton) {
+        event.stopPropagation();
+        toggleMethod(selectButton.dataset.select);
+        return;
+      }
+      const card = event.target.closest(".card");
+      if (card) openCard(card.dataset.title);
+    });
+
+    grid.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      if (event.target.closest("[data-select]")) return;
+      const card = event.target.closest(".card");
+      if (!card) return;
+      event.preventDefault();
+      openCard(card.dataset.title);
+    });
+
+    document.querySelector("#searchForm").addEventListener("submit", event => {
+      event.preventDefault();
+      renderCards();
+    });
+
+    searchInput.addEventListener("input", renderCards);
+    goalFilter.addEventListener("change", renderCards);
+    audienceFilter.addEventListener("change", renderCards);
+    topicInput.addEventListener("input", updatePrompt);
+    audienceInput.addEventListener("input", updatePrompt);
+    outcomeInput.addEventListener("input", updatePrompt);
+    selectedMethods.addEventListener("click", event => {
+      const button = event.target.closest("[data-remove]");
+      if (!button) return;
+      selectedTitles.delete(button.dataset.remove);
+      renderCards();
+      updatePrompt();
+      promptStatus.textContent = `已移除「${button.dataset.remove}」。`;
+    });
+    copyPrompt.addEventListener("click", copyPromptText);
+    document.querySelectorAll("[data-ai]").forEach(button => {
+      button.addEventListener("click", () => openAiTool(button.dataset.ai));
+    });
+    closeModal.addEventListener("click", () => modal.classList.remove("open"));
+    modal.addEventListener("click", event => {
+      if (event.target === modal) modal.classList.remove("open");
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") modal.classList.remove("open");
+    });
+
+    renderChips();
+    renderCards();
+    updatePrompt();
+  </script>
+</body>
+</html>
